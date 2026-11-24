@@ -4,6 +4,7 @@ import { MongoClient } from "mongodb";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
+import { initializedUserBoard } from "../init-user-board";
 
 const uri = process.env.MONGODB_URI;
 if (!uri) {
@@ -28,6 +29,20 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  databaseHooks:{
+    user:{
+      create:{
+        after:async(user)=>{
+  
+          if(user.id){
+              await initializedUserBoard(user.id)
+          }
+
+        
+        }
+      }
+    }
+  }
 });
 
 export const getSession = cache(async () => {
